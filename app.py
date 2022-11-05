@@ -15,17 +15,27 @@ import sys
 
 
 class Ui_Form(object):
+    def get_path(self,pathcomplet):
+        liste_chemin = pathcomplet.split("/")
+        titre = liste_chemin[-1]
+        chemin = "/".join(liste_chemin[:-1]) + "/"
+        return chemin , titre
+
     def fonction(self) :
         try:
             lien = self.input.text()
             youtube = YouTube(lien)
             titre = youtube.title + ".mp4"
-            pathfile, _ = QFileDialog.getSaveFileName(None,'Save your video', titre, "mp4 vidéo (*.mp4);;All Files (*)")
-            print(pathfile)
-            video = youtube.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download(output_path=pathfile)
+        except:
+            self.finish.setText("Un problème à eu lieu, l'url semble être incorrecte.")
+        try:
+            pathcomplet, _ = QFileDialog.getSaveFileName(None,'Save your video', titre, "mp4 vidéo (*.mp4);;All Files (*)")
+            pathfile_finale , titre = self.get_path(pathcomplet)
+            self.get_path(pathcomplet)
+            video = youtube.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download(output_path=pathfile_finale,filename=titre)
             self.finish.setText("Votre téléchargement est fini !")
         except:
-            self.finish.setText("Un probleme à eu lieu :(")
+            self.finish.setText("Un probleme à eu lieu lors du téléchargement !.")
 
     def setupUi(self, Form):
         Form.setObjectName("Yt Downloader")
